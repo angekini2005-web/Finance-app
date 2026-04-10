@@ -1,0 +1,29 @@
+[
+    {
+        "account": "test",
+        "amount": 5000.0,
+        "type": "income",
+        "description": "test",
+        "client": "KINI",
+        "project": "test",
+        "date": "2026-03-31 17:22:37"
+    },
+    {
+        "account": "cash",
+        "amount": 2000.0,
+        "type": "expense",
+        "description": "achat materiel",
+        "client": "siteweb",
+        "project": "achat materiel",
+        "date": "2026-03-31 17:32:35"
+    },
+    {
+        "account": "income",
+        "amount": 5000.0,
+        "type": "tests",
+        "description": "tests",
+        "client": null,
+        "project": null,
+        "date": "2026-04-02 02:57:16"
+    }
+]

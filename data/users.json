@@ -1,0 +1,12 @@
+{
+    "ange": {
+        "password": "1234",
+        "premium": false,
+        "start_date": "2026-04-01T10:00:00"
+    },
+    "KINI Ange": {
+        "password": "12345",
+        "premium": true,
+        "start_date": "2026-04-09 15:57:41.666142"
+    }
+}

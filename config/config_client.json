@@ -1,0 +1,18 @@
+{
+  "comptes": ["principal"],
+
+  "seuil_alerte": 0,
+
+  "clients": [],
+
+  "projets": [
+    {
+      "nom": "Projet A",
+      "budget": 100000
+    },
+    {
+      "nom": "Projet B",
+      "budget": 50000
+    }
+  ]
+}

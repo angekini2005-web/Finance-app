@@ -1,0 +1,26 @@
+[
+    {
+        "amount": 50000.0,
+        "type": "income",
+        "project": "test",
+        "date": "2026-04-07 14:10:15.386150"
+    },
+    {
+        "amount": 40000.0,
+        "type": "expense",
+        "project": "test2",
+        "date": "2026-04-07 14:10:52.209680"
+    },
+    {
+        "amount": 5000.0,
+        "type": "income",
+        "project": "test2",
+        "date": "2026-04-09 15:58:30.316662"
+    },
+    {
+        "amount": 3000.0,
+        "type": "expense",
+        "project": "test",
+        "date": "2026-04-09 15:58:48.744671"
+    }
+]
