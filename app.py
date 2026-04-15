@@ -141,7 +141,7 @@ elif menu == "💳 Premium":
 st.subheader("💰 Paiement")
 
 st.info("📱 Orange Money : +226 67 45 45 91")
-st.info("📱 Moov Money : +226 70 30 44 10")
+st.info("📱 Orange Money : +226 77 46 81 41")
 
 st.warning("⚠️ Après paiement, envoyez une preuve pour activation")
 
