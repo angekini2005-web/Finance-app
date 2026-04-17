@@ -1,76 +1,48 @@
 import streamlit as st
-import matplotlib.pyplot as plt
-from scripts.accounts import load_transactions
+import plotly.graph_objects as go
+import pandas as pd
+import json
 
-def get_financial_data():
+def load_data():
+    try:
+        with open("data/transactions.json") as f:
+            return json.load(f)
+    except:
+        return []
 
-    username = st.session_state.user
-    transactions = load_transactions(username)
+def show_dashboard():
+    st.title("💰 Dashboard Financier")
 
-    income = 0
-    expense = 0
+    data = load_data()
 
-    for t in transactions:
-        if t["type"] == "income":
-            income += t["amount"]
-        else:
-            expense += t["amount"]
-
+    income = sum(t["amount"] for t in data if t["type"] == "income")
+    expense = sum(t["amount"] for t in data if t["type"] == "expense")
     balance = income - expense
 
-    return income, expense, balance
-
-
-def show_kpis():
-
-    income, expense, balance = get_financial_data()
+    # 🎨 CSS
+    st.markdown("""
+    <style>
+    .card {
+        background-color: #111827;
+        padding: 20px;
+        border-radius: 15px;
+        color: white;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns(3)
 
-    with col1:
-        st.metric("💰 Revenus", f"{income} FCFA")
+    col1.markdown(f"<div class='card'>💰 Solde<br><h2>{balance}$</h2></div>", unsafe_allow_html=True)
+    col2.markdown(f"<div class='card'>📈 Revenus<br><h2>{income}$</h2></div>", unsafe_allow_html=True)
+    col3.markdown(f"<div class='card'>📉 Dépenses<br><h2>{expense}$</h2></div>", unsafe_allow_html=True)
 
-    with col2:
-        st.metric("💸 Dépenses", f"{expense} FCFA")
+    # 📊 Graphique
+    dates = [t["date"] for t in data]
+    amounts = [t["amount"] if t["type"]=="income" else -t["amount"] for t in data]
 
-    with col3:
-        st.metric("📈 Solde", f"{balance} FCFA")
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=dates, y=amounts, mode="lines+markers"))
 
-
-def show_bar_chart():
-
-    income, expense, _ = get_financial_data()
-
-    labels = ["Revenus", "Dépenses"]
-    values = [income, expense]
-
-    fig, ax = plt.subplots()
-    ax.bar(labels, values)
-
-    st.subheader("📊 Revenus vs Dépenses")
-    st.pyplot(fig)
-
-
-def show_pie_chart():
-
-    income, expense, _ = get_financial_data()
-
-    labels = ["Revenus", "Dépenses"]
-    sizes = [income, expense]
-
-    fig, ax = plt.subplots()
-    ax.pie(sizes, labels=labels, autopct="%1.1f%%")
-
-    st.subheader("🥧 Répartition")
-    st.pyplot(fig)
-
-
-def show_dashboard():
-
-    st.title("📊 Dashboard Financier")
-
-    show_kpis()
-    st.write("---")
-
-    show_bar_chart()
-    show_pie_chart()
+    fig.update_layout(template="plotly_dark")
+    st.plotly_chart(fig, use_container_width=True)

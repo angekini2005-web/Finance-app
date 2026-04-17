@@ -1,43 +1,34 @@
 import streamlit as st
-from scripts.accounts import load_transactions
+import json
+
+def load_data():
+    try:
+        with open("data/transactions.json") as f:
+            return json.load(f)
+    except:
+        return []
 
 def project_alerts():
+    st.subheader("🚨 Alertes")
 
-    username = st.session_state.user
-    transactions = load_transactions(username)
+    data = load_data()
 
-    if not transactions:
-        st.warning("❌ Aucune transaction")
-        return
+    total = sum(t["amount"] if t["type"]=="income" else -t["amount"] for t in data)
 
-    project_data = {}
+    if total < 0:
+        st.error("⚠️ Solde négatif !")
+    elif total < 500:
+        st.warning("⚠️ Solde faible")
+    else:
+        st.success("✅ Situation stable")
 
-    for t in transactions:
-        project = t.get("project")
+def forecast():
+    st.subheader("📊 Prévisions")
 
-        if not project:
-            continue
+    data = load_data()
 
-        if project not in project_data:
-            project_data[project] = 0
+    total = sum(t["amount"] if t["type"]=="income" else -t["amount"] for t in data)
 
-        if t["type"] == "income":
-            project_data[project] += t["amount"]
-        else:
-            project_data[project] -= t["amount"]
+    prediction = total * 1.2
 
-    st.title("🚨 Alertes projets")
-
-    for project, balance in project_data.items():
-
-        st.subheader(f"📁 {project}")
-
-        if balance < 0:
-            st.error("🔴 Projet en perte")
-        elif balance < 100:
-            st.warning("⚠️ Projet faible")
-        else:
-            st.success("🟢 Projet rentable")
-
-        st.write(f"💰 Solde : {balance}")
-        st.write("---")
+    st.info(f"Projection 30 jours : {prediction}$")
