@@ -1,6 +1,7 @@
 import streamlit as st
 import plotly.graph_objects as go
 import json
+import pandas as pd
 
 def load_data():
     try:
@@ -11,7 +12,7 @@ def load_data():
 
 def show_dashboard():
 
-    st.markdown("# 💰 Dashboard")
+    st.markdown("## 💰 Financial Dashboard")
 
     data = load_data()
 
@@ -19,85 +20,87 @@ def show_dashboard():
     expense = sum(t["amount"] for t in data if t["type"] == "expense")
     balance = income - expense
 
-    # 🎨 CSS ULTRA PRO
+    # 🎨 STYLE
     st.markdown("""
     <style>
-    .main {
-        background-color: #0f172a;
-    }
-
     .card {
-        background: linear-gradient(135deg, #1e293b, #0f172a);
-        padding: 25px;
-        border-radius: 18px;
+        background: #111827;
+        padding: 20px;
+        border-radius: 15px;
         color: white;
-        box-shadow: 0px 8px 25px rgba(0,0,0,0.4);
-        transition: 0.3s;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
     }
-
-    .card:hover {
-        transform: scale(1.03);
-    }
-
     .title {
         font-size: 14px;
-        color: #94a3b8;
+        color: #9CA3AF;
     }
-
     .value {
-        font-size: 32px;
+        font-size: 28px;
         font-weight: bold;
     }
     </style>
     """, unsafe_allow_html=True)
-
-    st.write("")
 
     # 🧱 CARTES
     col1, col2, col3 = st.columns(3)
 
     col1.markdown(f"""
     <div class="card">
-        <div class="title">💰 Solde total</div>
+        <div class="title">Total Balance</div>
         <div class="value">{balance} FCFA</div>
     </div>
     """, unsafe_allow_html=True)
 
     col2.markdown(f"""
     <div class="card">
-        <div class="title">📈 Revenus</div>
+        <div class="title">Income</div>
         <div class="value">{income} FCFA</div>
     </div>
     """, unsafe_allow_html=True)
 
     col3.markdown(f"""
     <div class="card">
-        <div class="title">📉 Dépenses</div>
+        <div class="title">Expenses</div>
         <div class="value">{expense} FCFA</div>
     </div>
     """, unsafe_allow_html=True)
 
     st.write("")
-    st.write("")
 
-    # 📊 GRAPHIQUE PRO
-    dates = [t["date"] for t in data]
-    values = [t["amount"] if t["type"]=="income" else -t["amount"] for t in data]
+    # 📊 + 📋 LAYOUT COMME IMAGE
+    left, right = st.columns([2,1])
 
-    fig = go.Figure()
+    # 📊 GRAPHIQUE
+    with left:
+        st.subheader("📊 Overview")
 
-    fig.add_trace(go.Scatter(
-        x=dates,
-        y=values,
-        mode="lines+markers",
-        line=dict(width=4),
-        name="Flux"
-    ))
+        dates = [t["date"] for t in data]
+        values = [t["amount"] if t["type"]=="income" else -t["amount"] for t in data]
 
-    fig.update_layout(
-        template="plotly_dark",
-        height=400,
-        margin=dict(l=10, r=10, t=30, b=10)
-    )
+        fig = go.Figure()
 
-    st.plotly_chart(fig, use_container_width=True)
+        fig.add_trace(go.Scatter(
+            x=dates,
+            y=values,
+            mode="lines+markers",
+            line=dict(width=3),
+            name="Cash Flow"
+        ))
+
+        fig.update_layout(
+            template="plotly_dark",
+            height=400,
+            margin=dict(l=10, r=10, t=30, b=10)
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+
+    # 📋 TABLEAU À DROITE
+    with right:
+        st.subheader("📋 Transactions")
+
+        if data:
+            df = pd.DataFrame(data)
+            st.dataframe(df.tail(5), use_container_width=True)
+        else:
+            st.info("No data")
