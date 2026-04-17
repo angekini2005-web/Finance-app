@@ -3,7 +3,7 @@ import plotly.graph_objects as go
 import json
 import pandas as pd
 
-# 📂 Charger les données
+# 📂 Charger données
 def load_data():
     try:
         with open("data/transactions.json") as f:
@@ -11,78 +11,101 @@ def load_data():
     except:
         return []
 
-# 🚀 Dashboard principal
+# 🚀 Dashboard
 def show_dashboard():
-
-    st.title("💰 Dashboard Financier")
 
     data = load_data()
 
-    # 📊 Calculs
     income = sum(t["amount"] for t in data if t["type"] == "income")
     expense = sum(t["amount"] for t in data if t["type"] == "expense")
     balance = income - expense
 
-    # 📊 BADGES (simulation pro)
-    badge_balance = "+5%" if balance >= 0 else "-5%"
-    badge_income = "+12%"
-    badge_expense = "-3%"
-
-    badge_balance_class = "badge-green" if balance >= 0 else "badge-red"
-
-    # 🎨 STYLE GLOBAL
+    # 🎨 STYLE GLOBAL ULTRA PRO
     st.markdown("""
     <style>
-    .block-container {
-        padding-top: 2rem;
+
+    /* 🌍 Fond global */
+    [data-testid="stAppViewContainer"] {
+        background-color: #f5f7fb;
     }
 
+    /* 📌 Sidebar */
+    [data-testid="stSidebar"] {
+        background-color: #111827;
+    }
+
+    /* 🧱 Cartes */
     .card {
-        background-color: white;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0px 4px 15px rgba(0,0,0,0.08);
+        background: white;
+        padding: 18px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     }
 
     .metric-title {
+        font-size: 13px;
         color: #6b7280;
-        font-size: 14px;
     }
 
     .metric-value {
-        font-size: 28px;
-        font-weight: bold;
+        font-size: 26px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
     .badge-green {
-        background-color: #22c55e;
+        background: #22c55e;
         color: white;
-        padding: 4px 10px;
-        border-radius: 8px;
-        font-size: 12px;
-        margin-left: 10px;
+        padding: 3px 8px;
+        border-radius: 6px;
+        font-size: 11px;
     }
 
     .badge-red {
-        background-color: #ef4444;
+        background: #ef4444;
         color: white;
-        padding: 4px 10px;
-        border-radius: 8px;
-        font-size: 12px;
-        margin-left: 10px;
+        padding: 3px 8px;
+        border-radius: 6px;
+        font-size: 11px;
     }
+
+    /* 📋 Table */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th {
+        text-align: left;
+        color: #6b7280;
+        font-size: 13px;
+    }
+
+    td {
+        padding: 8px 0;
+        font-size: 14px;
+    }
+
     </style>
     """, unsafe_allow_html=True)
 
-    # 🧱 CARTES KPI
+    st.title("💰 Dashboard Financier")
+
+    # 🧠 BADGES
+    badge_balance_class = "badge-green" if balance >= 0 else "badge-red"
+    badge_balance_value = "+5%" if balance >= 0 else "-5%"
+
+    # 🧱 CARTES
     col1, col2, col3 = st.columns(3)
 
     col1.markdown(f"""
     <div class="card">
         <div class="metric-title">Solde total</div>
         <div class="metric-value">
-            {balance} FCFA 
-            <span class="{badge_balance_class}">{badge_balance}</span>
+            {balance} FCFA
+            <span class="{badge_balance_class}">{badge_balance_value}</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -91,8 +114,8 @@ def show_dashboard():
     <div class="card">
         <div class="metric-title">Revenus</div>
         <div class="metric-value">
-            {income} FCFA 
-            <span class="badge-green">{badge_income}</span>
+            {income} FCFA
+            <span class="badge-green">+12%</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -101,80 +124,91 @@ def show_dashboard():
     <div class="card">
         <div class="metric-title">Dépenses</div>
         <div class="metric-value">
-            {expense} FCFA 
-            <span class="badge-red">{badge_expense}</span>
+            {expense} FCFA
+            <span class="badge-red">-3%</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
     st.write("")
 
-    # 📊 GRAPHIQUE DANS UNE CARD
-    st.markdown('<div class="card">', unsafe_allow_html=True)
+    # 📊 + 📋 LAYOUT
+    left, right = st.columns([2,1])
 
-    st.subheader("📈 Évolution financière")
+    # 📊 GRAPHIQUE
+    with left:
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        st.subheader("📈 Évolution financière")
 
-    if data:
-        dates = [t["date"] for t in data]
-        revenus = [t["amount"] if t["type"]=="income" else 0 for t in data]
-        depenses = [t["amount"] if t["type"]=="expense" else 0 for t in data]
+        if data:
+            dates = [t["date"] for t in data]
+            revenus = [t["amount"] if t["type"]=="income" else 0 for t in data]
+            depenses = [t["amount"] if t["type"]=="expense" else 0 for t in data]
 
-        fig = go.Figure()
+            fig = go.Figure()
 
-        fig.add_trace(go.Scatter(
-            x=dates,
-            y=revenus,
-            mode="lines+markers",
-            name="Revenus"
-        ))
+            fig.add_trace(go.Scatter(
+                x=dates,
+                y=revenus,
+                mode="lines",
+                name="Revenus",
+                line=dict(width=2)
+            ))
 
-        fig.add_trace(go.Scatter(
-            x=dates,
-            y=depenses,
-            mode="lines+markers",
-            name="Dépenses"
-        ))
+            fig.add_trace(go.Scatter(
+                x=dates,
+                y=depenses,
+                mode="lines",
+                name="Dépenses",
+                line=dict(width=2)
+            ))
 
-        fig.update_layout(
-            template="plotly_white",
-            height=400,
-            margin=dict(l=10, r=10, t=30, b=10)
-        )
+            fig.update_layout(
+                template="plotly_white",
+                height=320,
+                margin=dict(l=0, r=0, t=10, b=0)
+            )
 
-        st.plotly_chart(fig, use_container_width=True)
-    else:
-        st.info("Aucune donnée")
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.info("Aucune donnée")
 
-    st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
-    st.write("")
+    # 📋 TABLEAU
+    with right:
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        st.subheader("📄 Transactions")
 
-    # 📋 TABLEAU PRO
-    st.markdown('<div class="card">', unsafe_allow_html=True)
+        if data:
+            df = pd.DataFrame(data).tail(4)
 
-    st.subheader("📄 Dernières transactions")
+            rows = ""
+            for _, row in df.iterrows():
+                color = "#22c55e" if row["type"] == "income" else "#ef4444"
+                sign = "+" if row["type"] == "income" else "-"
 
-    if data:
-        df = pd.DataFrame(data).tail(5)
+                rows += f"""
+                <tr>
+                    <td>{row['date']}</td>
+                    <td>{row['type']}</td>
+                    <td style="color:{color}; font-weight:600;">
+                        {sign} {row['amount']} FCFA
+                    </td>
+                </tr>
+                """
 
-        # 🧠 Format pro (comme ton image)
-        def format_amount(row):
-            if row["type"] == "income":
-                return f"+ {row['amount']} FCFA"
-            else:
-                return f"- {row['amount']} FCFA"
+            st.markdown(f"""
+            <table>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Montant</th>
+                </tr>
+                {rows}
+            </table>
+            """, unsafe_allow_html=True)
+        else:
+            st.info("Aucune transaction")
 
-        df["Montant"] = df.apply(format_amount, axis=1)
-
-        df = df.rename(columns={
-            "date": "Date",
-            "type": "Type"
-        })
-
-        df = df[["Date", "Type", "Montant"]]
-
-        st.dataframe(df, use_container_width=True)
-    else:
-        st.info("Aucune transaction")
-
-    st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
