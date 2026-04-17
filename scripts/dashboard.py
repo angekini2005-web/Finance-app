@@ -11,7 +11,7 @@ def load_data():
     except:
         return []
 
-# 🚀 Dashboard
+# 🚀 Dashboard principal
 def show_dashboard():
 
     data = load_data()
@@ -20,21 +20,20 @@ def show_dashboard():
     expense = sum(t["amount"] for t in data if t["type"] == "expense")
     balance = income - expense
 
-    # 🎨 STYLE GLOBAL ULTRA PRO
+    # 🎨 STYLE GLOBAL (LISIBLE + PRO)
     st.markdown("""
     <style>
 
-    /* 🌍 Fond global */
     [data-testid="stAppViewContainer"] {
         background-color: #f5f7fb;
     }
 
-    /* 📌 Sidebar */
-    [data-testid="stSidebar"] {
-        background-color: #111827;
+    /* Texte global */
+    html, body, [class*="css"]  {
+        color: #111827;
     }
 
-    /* 🧱 Cartes */
+    /* Cartes */
     .card {
         background: white;
         padding: 18px;
@@ -50,6 +49,7 @@ def show_dashboard():
     .metric-value {
         font-size: 26px;
         font-weight: 600;
+        color: #111827;
         display: flex;
         align-items: center;
         gap: 8px;
@@ -71,31 +71,14 @@ def show_dashboard():
         font-size: 11px;
     }
 
-    /* 📋 Table */
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    th {
-        text-align: left;
-        color: #6b7280;
-        font-size: 13px;
-    }
-
-    td {
-        padding: 8px 0;
-        font-size: 14px;
-    }
-
     </style>
     """, unsafe_allow_html=True)
 
     st.title("💰 Dashboard Financier")
 
-    # 🧠 BADGES
-    badge_balance_class = "badge-green" if balance >= 0 else "badge-red"
-    badge_balance_value = "+5%" if balance >= 0 else "-5%"
+    # 🧠 BADGE SOLDE
+    badge_class = "badge-green" if balance >= 0 else "badge-red"
+    badge_value = "+5%" if balance >= 0 else "-5%"
 
     # 🧱 CARTES
     col1, col2, col3 = st.columns(3)
@@ -105,7 +88,7 @@ def show_dashboard():
         <div class="metric-title">Solde total</div>
         <div class="metric-value">
             {balance} FCFA
-            <span class="{badge_balance_class}">{badge_balance_value}</span>
+            <span class="{badge_class}">{badge_value}</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -175,39 +158,28 @@ def show_dashboard():
 
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # 📋 TABLEAU
+    # 📋 TABLEAU PRO
     with right:
         st.markdown('<div class="card">', unsafe_allow_html=True)
         st.subheader("📄 Transactions")
 
         if data:
-            df = pd.DataFrame(data).tail(4)
+            df = pd.DataFrame(data).tail(5)
 
-            rows = ""
-            for _, row in df.iterrows():
-                color = "#22c55e" if row["type"] == "income" else "#ef4444"
-                sign = "+" if row["type"] == "income" else "-"
+            df["Montant"] = df.apply(
+                lambda x: f"+{x['amount']} FCFA" if x["type"] == "income"
+                else f"-{x['amount']} FCFA",
+                axis=1
+            )
 
-                rows += f"""
-                <tr>
-                    <td>{row['date']}</td>
-                    <td>{row['type']}</td>
-                    <td style="color:{color}; font-weight:600;">
-                        {sign} {row['amount']} FCFA
-                    </td>
-                </tr>
-                """
+            df = df.rename(columns={
+                "date": "Date",
+                "type": "Type"
+            })
 
-            st.markdown(f"""
-            <table>
-                <tr>
-                    <th>Date</th>
-                    <th>Type</th>
-                    <th>Montant</th>
-                </tr>
-                {rows}
-            </table>
-            """, unsafe_allow_html=True)
+            df = df[["Date", "Type", "Montant"]]
+
+            st.dataframe(df, use_container_width=True)
         else:
             st.info("Aucune transaction")
 
