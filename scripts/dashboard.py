@@ -11,8 +11,9 @@ def load_data():
     except:
         return []
 
-# 🚀 Dashboard principal
 def show_dashboard():
+
+    st.set_page_config(layout="wide")
 
     data = load_data()
 
@@ -20,25 +21,35 @@ def show_dashboard():
     expense = sum(t["amount"] for t in data if t["type"] == "expense")
     balance = income - expense
 
-    # 🎨 STYLE GLOBAL (LISIBLE + PRO)
+    # 🎨 STYLE GLOBAL (CORRIGÉ + LISIBLE)
     st.markdown("""
     <style>
 
+    /* 🌍 Fond */
     [data-testid="stAppViewContainer"] {
         background-color: #f5f7fb;
     }
 
-    /* Texte global */
-    html, body, [class*="css"]  {
-        color: #111827;
+    /* 📌 Sidebar premium */
+    [data-testid="stSidebar"] {
+        background-color: #0f172a;
     }
 
-    /* Cartes */
+    [data-testid="stSidebar"] * {
+        color: white !important;
+    }
+
+    /* 🧱 Cartes */
     .card {
         background: white;
         padding: 18px;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    /* 📝 TITRES (FIX ICI) */
+    h1, h2, h3, h4 {
+        color: #111827 !important;
     }
 
     .metric-title {
@@ -58,25 +69,36 @@ def show_dashboard():
     .badge-green {
         background: #22c55e;
         color: white;
-        padding: 3px 8px;
-        border-radius: 6px;
+        padding: 4px 10px;
+        border-radius: 8px;
         font-size: 11px;
     }
 
     .badge-red {
         background: #ef4444;
         color: white;
-        padding: 3px 8px;
-        border-radius: 6px;
+        padding: 4px 10px;
+        border-radius: 8px;
         font-size: 11px;
     }
 
     </style>
     """, unsafe_allow_html=True)
 
-    st.title("💰 Dashboard Financier")
+    # 📌 SIDEBAR PRO
+    st.sidebar.title("💼 Finance App")
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("🏠 Dashboard")
+    st.sidebar.markdown("🚨 Alertes")
+    st.sidebar.markdown("📊 Prévisions")
+    st.sidebar.markdown("📄 Historique")
+    st.sidebar.markdown("---")
+    st.sidebar.info("Version Premium 🔒")
 
-    # 🧠 BADGE SOLDE
+    # 🏷️ TITRE PRINCIPAL
+    st.markdown("## 💰 Dashboard Financier")
+
+    # 🧠 BADGE
     badge_class = "badge-green" if balance >= 0 else "badge-red"
     badge_value = "+5%" if balance >= 0 else "-5%"
 
@@ -121,7 +143,7 @@ def show_dashboard():
     # 📊 GRAPHIQUE
     with left:
         st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.subheader("📈 Évolution financière")
+        st.markdown("### 📈 Évolution financière")
 
         if data:
             dates = [t["date"] for t in data]
@@ -158,10 +180,10 @@ def show_dashboard():
 
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # 📋 TABLEAU PRO
+    # 📋 TABLEAU
     with right:
         st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.subheader("📄 Transactions")
+        st.markdown("### 📄 Transactions")
 
         if data:
             df = pd.DataFrame(data).tail(5)
